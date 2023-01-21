@@ -1,0 +1,24 @@
+version: '2.4'
+
+services:
+
+  app:
+    container_name: web_scraper_denca_2-app
+    hostname: web_scraper_denca_2-app
+    image: flakooo/myprojects:web_scraper_denca_2-app
+    restart: always
+    depends_on:
+      - selenium-chrome
+    volumes:
+      - "..:/opt/web_scraper_denca_2"
+    ports:
+      - "8088:8088"
+
+  selenium-chrome:
+    container_name: web_scraper_denca_2-selenium
+    hostname: web_scraper_denca_2-selenium
+#    image: selenium/standalone-chrome:103.0
+    image: seleniarm/standalone-chromium:103.0 # Image supporting Mac's m1 cpu
+    restart: always
+    ports:
+      - "4444:4444"
