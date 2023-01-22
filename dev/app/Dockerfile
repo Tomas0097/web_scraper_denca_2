@@ -6,3 +6,8 @@ WORKDIR /opt/web_scraper_denca_2
 COPY requirements.txt .
 RUN pip3 install -U pip
 RUN pip3 install --no-cache-dir --force-reinstall -r requirements.txt
+
+COPY dev/app/*.sh /
+RUN chmod +x /*.sh
+
+CMD /docker-start.sh
