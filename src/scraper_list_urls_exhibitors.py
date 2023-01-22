@@ -1,1 +1,1 @@
-print("cus")
+print("")
