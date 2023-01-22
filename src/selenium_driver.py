@@ -17,7 +17,7 @@ def start_chrome_driver() -> WebDriver:
         chrome_options.add_argument(argument)
 
     driver = Remote(
-        command_executor='http://real-estate-hunter-selenium:4444/wd/hub',
+        command_executor="http://web_scraper_denca_2-selenium:4444/wd/hub",
         options=chrome_options
     )
 
