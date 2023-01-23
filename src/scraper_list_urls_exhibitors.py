@@ -5,7 +5,7 @@ from selenium_driver import start_chrome_driver
 
 
 def get_detail_urls_from_exhibitor_list(exhibitor_list_url):
-    time.sleep(5) # Allow 5 seconds for start Selenium.
+    time.sleep(10) # Allow 10 seconds for start Selenium.
     print("Launching Selenium Chrome driver")
     chrome_driver = start_chrome_driver()
     time.sleep(5)  # Allow 5 seconds for setup Chrome driver.
@@ -35,12 +35,18 @@ def get_detail_urls_from_exhibitor_list(exhibitor_list_url):
         if screen_height * i > scroll_height:
             break
 
-    print("Saving exhibitors detail urls")
+    print("Parsing exhibitors detail urls")
     soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
     for a in soup.select_one(".infinite-scroll-component").find_all("a"):
         exhibitors_detail_urls.append(a.attrs["href"])
 
-    print(f"Number of saved exhibitors detail urls: {len(exhibitors_detail_urls)}")
+    print(f"Number of parsed exhibitors detail urls: {len(exhibitors_detail_urls)}")
 
+    print("Saving parsed exhibitors detail urls")
+    with open("exhibitors_detail_urls.txt", "w") as file:
+        for url_path in exhibitors_detail_urls:
+            file.write(f"https://connections.arabhealthonline.com/{url_path}\n")
+
+    print("The file is saved.")
     # Quitting is extremely important for properly running the next driver.
     chrome_driver.quit()
