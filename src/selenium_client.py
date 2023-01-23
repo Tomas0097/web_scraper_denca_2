@@ -16,9 +16,7 @@ def start_chrome_driver() -> WebDriver:
     for argument in chrome_options_arguments:
         chrome_options.add_argument(argument)
 
-    driver = Remote(
+    return Remote(
         command_executor="http://web_scraper_denca_2-selenium:4444/wd/hub",
         options=chrome_options
     )
-
-    return driver

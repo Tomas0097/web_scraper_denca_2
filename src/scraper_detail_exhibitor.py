@@ -1,7 +1,7 @@
 import time
 import xlsxwriter
 from bs4 import BeautifulSoup
-from selenium_driver import start_chrome_driver
+from selenium_client import start_chrome_driver
 
 
 def parse_exhibitor_detail_url(exhibitor_detail_url):

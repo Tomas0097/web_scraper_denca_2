@@ -1,7 +1,7 @@
 import time
 from bs4 import BeautifulSoup
 
-from selenium_driver import start_chrome_driver
+from selenium_client import start_chrome_driver
 
 
 def get_detail_urls_from_exhibitor_list(exhibitor_list_url):
