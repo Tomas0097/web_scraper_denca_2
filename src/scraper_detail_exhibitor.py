@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 from selenium_client import start_chrome_driver
 
 
-def parse_exhibitor_detail_url(exhibitor_detail_url):
-    time.sleep(10) # Allow 10 seconds for start Selenium.
+def parse_exhibitor_detail_url():
+    time.sleep(10)  # Allow 10 seconds for start Selenium.
     print("Launching Selenium Chrome driver")
     chrome_driver = start_chrome_driver()
 
@@ -64,20 +64,21 @@ def parse_exhibitor_detail_url(exhibitor_detail_url):
                     chrome_driver.get(url)
                     time.sleep(1)  # Allow 1 seconds for the web page to open
                     soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
-                    div_all_fields = soup.select_one(".bpDsAS")
 
                     # Save Exhibitor name.
-                    exhibitor_name = div_all_fields.select_one(".hQJFGn").text
+                    exhibitor_name = soup.select_one(".hQJFGn").text
                     worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EXHIBITOR_NAME], exhibitor_name)
 
                     # Save Exhibitor detail page url from Arab health online web.
                     worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EXHIBITOR_ARAB_HEALTH_ONLINE_PAGE], url)
 
                     # Save Exhibitor country.
-                    div_label_country = div_all_fields.find("div", text="Country")
-                    div_label_country_next_sibling = div_label_country.next_sibling
-                    exhibitor_country = div_label_country_next_sibling.find("span").text
-                    worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_COUNTRY], exhibitor_country)
+                    div_label_country = soup.find("div", text="Country")
+                    if div_label_country:
+                        print(div_label_country)
+                        div_label_country_next_sibling = div_label_country.next_sibling
+                        exhibitor_country = div_label_country_next_sibling.find("span").text
+                        worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_COUNTRY], exhibitor_country)
 
 
                     # # Save Exhibitor basic information
@@ -95,30 +96,34 @@ def parse_exhibitor_detail_url(exhibitor_detail_url):
                     #         worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[field_name], ", ".join([s.text for s in spans]))
 
                     # Save Exhibitor contact information
-                    for field in div_contact_fields:
-                        # Exclude contact field in header on exhibitor detail page
-                        if "sc-hMjcWo" not in field.previous_sibling.attrs["class"]:
-
-                            svg_path = field.select_one("path").attrs["d"]
-                            text = field.select_one("a").text
-
-                            if svg_pat  h.startswith(SVG_BEGINNING_VALUES[F_TEL_1]):
-                                worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_1], text)
-                            elif svg_path.startswith(SVG_BEGINNING_VALUES[F_TEL_2]):
-                                worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_2], text)
-                            elif svg_path.startswith(SVG_BEGINNING_VALUES[F_EMAIL]):
-                                worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EMAIL], text)
-                            elif svg_path.startswith(SVG_BEGINNING_VALUES[F_WEB_PAGE]):
-                                worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_WEB_PAGE], text)
-                            elif svg_path.startswith(SVG_BEGINNING_VALUES[F_ADDRESS]):
-                                worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_ADDRESS], text)
+                    # for field in div_contact_fields:
+                    #     # Exclude contact field in header on exhibitor detail page
+                    #     if "sc-hMjcWo" not in field.previous_sibling.attrs["class"]:
+                    #
+                    #         svg_path = field.select_one("path").attrs["d"]
+                    #         text = field.select_one("a").text
+                    #
+                    #         if svg_pat  h.startswith(SVG_BEGINNING_VALUES[F_TEL_1]):
+                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_1], text)
+                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_TEL_2]):
+                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_2], text)
+                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_EMAIL]):
+                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EMAIL], text)
+                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_WEB_PAGE]):
+                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_WEB_PAGE], text)
+                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_ADDRESS]):
+                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_ADDRESS], text)
 
                     successfully_extracted_detail_page = True
 
                 except Exception as exception:
                     print(exception)
+                    print(url)
+                    print(soup.select_one(".hQJFGn"))
+                    print(div_label_country_next_sibling.find("span"))
 
             row += 1
+            print(f"Number of saved Exhibitors: {row}")
 
     workbook.close()
     chrome_driver.close()
