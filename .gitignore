@@ -1,2 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+
+# Pycharm files
+.idea
+
+# MacOS bullshits
+.DS_Store
