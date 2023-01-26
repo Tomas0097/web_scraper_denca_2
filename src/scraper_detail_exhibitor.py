@@ -57,7 +57,7 @@ def parse_exhibitor_detail_url():
     row = 1
 
     print("Opening file: 'exhibitors_detail_urls.txt'")
-    with open("exhibitors_detail_urls.txt", "r") as file:
+    with open("../exhibitors_detail_urls.txt", "r") as file:
         for url in file:
             successfully_extracted_detail_page = False
 

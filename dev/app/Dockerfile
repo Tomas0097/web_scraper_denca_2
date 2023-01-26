@@ -1,13 +1,18 @@
 FROM python:3.12-rc-bullseye
-RUN mkdir -p /opt/web_scraper_denca_2
+RUN mkdir /opt/web_scraper_denca_2
 WORKDIR /opt/web_scraper_denca_2
 
-# install requirements.txt
+# Copies and installs requirements.txt -> This image must be built from the project
+# root folder. In this case, it is 'web_scraper_denca_2.
 COPY requirements.txt .
-RUN pip3 install -U pip
-RUN pip3 install --no-cache-dir --force-reinstall -r requirements.txt
+RUN pip3 install -r requirements.txt
 
-COPY dev/app/*.sh /
-RUN chmod +x /*.sh
+# Copies files and allows them to be executable.
+#COPY dev/app/*.sh /
+#RUN chmod +x /*.sh
 
-CMD /docker-start.sh
+# Run a file script.
+#CMD /docker-start.sh
+
+# Makes a container run without stopping.
+ENTRYPOINT ["tail", "-f", "/dev/null"]
