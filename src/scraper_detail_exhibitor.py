@@ -23,6 +23,7 @@ def parse_exhibitor_detail_url():
     F_TEL_2 = "Tel 2"
     F_EMAIL = "Email"
     F_WEB_PAGE = "Web Page"
+    F_ADDRESS = "Address"
 
     # ----------------------------------------------------------------------------------------------------------------------------
     # SVG beginning values for recognizing contact fields in html code.
@@ -32,6 +33,7 @@ def parse_exhibitor_detail_url():
         F_TEL_2: "M19 15a1",
         F_EMAIL: "M12.924",
         F_WEB_PAGE: "M10.342",
+        F_ADDRESS: "M15 10a3"
     }
 
     # Sets the column number for the fields.
@@ -44,6 +46,7 @@ def parse_exhibitor_detail_url():
         F_TEL_2: 5,
         F_EMAIL: 6,
         F_WEB_PAGE: 7,
+        F_ADDRESS: 8,
     }
 
     # Write headers into worksheet
@@ -60,9 +63,8 @@ def parse_exhibitor_detail_url():
 
             while not successfully_extracted_detail_page:
                 try:
-                    # print(f"Extracted pages: {row}")
                     chrome_driver.get(url)
-                    time.sleep(1)  # Allow 1 seconds for the web page to open
+                    time.sleep(4)  # Allow 4 seconds for the web page to open. This is minimum now.
                     soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
 
                     # Save Exhibitor name.
@@ -72,58 +74,46 @@ def parse_exhibitor_detail_url():
                     # Save Exhibitor detail page url from Arab health online web.
                     worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EXHIBITOR_ARAB_HEALTH_ONLINE_PAGE], url)
 
+                    # Save featured exhibitor.
+                    div_label_featured_exhibitor = soup.find("div", text="Type")
+                    if div_label_featured_exhibitor:
+                        worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_FEATURED_EXHIBITOR], "yes")
+                    else:
+                        worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_FEATURED_EXHIBITOR], "no")
+
                     # Save Exhibitor country.
                     div_label_country = soup.find("div", text="Country")
                     if div_label_country:
-                        print(div_label_country)
                         div_label_country_next_sibling = div_label_country.next_sibling
                         exhibitor_country = div_label_country_next_sibling.find("span").text
                         worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_COUNTRY], exhibitor_country)
 
-
-                    # # Save Exhibitor basic information
-                    # for field in div_basic_fields:
-                    #     field_name = field.select_one(".sc-exdmVY").text
-
-                    #     # Fields with one value
-                    #     if field_name in [F_COUNTRY_PAVILION, F_NATURE_OF_BUSINESS, F_FEATURED_EXHIBITOR]:
-                    #         worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[field_name], field.contents[1].text)
-
-                    #     # Fields with more values
-                    #     elif field_name in [F_COUNTRY, F_COUNTRY_COVERAGE, F_INTERESTED_TO_CONNECT_WITH, F_PRODUCT_CATEGORY_OFFERED,
-                    #                         F_PRODUCT_SUBCATEGORY_OFFERED]:
-                    #         spans = field.find_all("span", {"class": "sc-fATqzn"})
-                    #         worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[field_name], ", ".join([s.text for s in spans]))
-
                     # Save Exhibitor contact information
-                    # for field in div_contact_fields:
-                    #     # Exclude contact field in header on exhibitor detail page
-                    #     if "sc-hMjcWo" not in field.previous_sibling.attrs["class"]:
-                    #
-                    #         svg_path = field.select_one("path").attrs["d"]
-                    #         text = field.select_one("a").text
-                    #
-                    #         if svg_pat  h.startswith(SVG_BEGINNING_VALUES[F_TEL_1]):
-                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_1], text)
-                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_TEL_2]):
-                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_2], text)
-                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_EMAIL]):
-                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EMAIL], text)
-                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_WEB_PAGE]):
-                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_WEB_PAGE], text)
-                    #         elif svg_path.startswith(SVG_BEGINNING_VALUES[F_ADDRESS]):
-                    #             worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_ADDRESS], text)
+                    for element_anchor in soup.select(".jZUzxX"):
+                        svg_path = element_anchor.parent.previous_sibling.next.next.attrs["d"]
+                        text = element_anchor.next.text
+
+                        if svg_path.startswith(SVG_BEGINNING_VALUES[F_TEL_1]):
+                            worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_1], text)
+                        elif svg_path.startswith(SVG_BEGINNING_VALUES[F_TEL_2]):
+                            worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_TEL_2], text)
+                        elif svg_path.startswith(SVG_BEGINNING_VALUES[F_EMAIL]):
+                            worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EMAIL], text)
+                        elif svg_path.startswith(SVG_BEGINNING_VALUES[F_WEB_PAGE]):
+                            worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_WEB_PAGE], text)
+                        elif svg_path.startswith(SVG_BEGINNING_VALUES[F_ADDRESS]):
+                            worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_ADDRESS], text)
 
                     successfully_extracted_detail_page = True
 
                 except Exception as exception:
                     print(exception)
-                    print(url)
-                    print(soup.select_one(".hQJFGn"))
-                    print(div_label_country_next_sibling.find("span"))
 
             row += 1
             print(f"Number of saved Exhibitors: {row}")
+
+            if row == 100:
+                break
 
     workbook.close()
     chrome_driver.close()
