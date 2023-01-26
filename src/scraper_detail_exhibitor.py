@@ -19,21 +19,21 @@ def parse_exhibitor_detail_url():
     F_EXHIBITOR_ARAB_HEALTH_ONLINE_PAGE = "Exhibitor Arab Health Online Page"
     F_FEATURED_EXHIBITOR = "Featured Exhibitor"
     F_COUNTRY = "Country"
+    F_ADDRESS = "Address"
     F_TEL_1 = "Tel 1"
     F_TEL_2 = "Tel 2"
     F_EMAIL = "Email"
     F_WEB_PAGE = "Web Page"
-    F_ADDRESS = "Address"
 
     # ----------------------------------------------------------------------------------------------------------------------------
     # SVG beginning values for recognizing contact fields in html code.
     # ----------------------------------------------------------------------------------------------------------------------------
     SVG_BEGINNING_VALUES = {
+        F_ADDRESS: "M15 10a3",
         F_TEL_1: "M15 6a1",
         F_TEL_2: "M19 15a1",
         F_EMAIL: "M12.924",
         F_WEB_PAGE: "M10.342",
-        F_ADDRESS: "M15 10a3"
     }
 
     # Sets the column number for the fields.
@@ -42,11 +42,11 @@ def parse_exhibitor_detail_url():
         F_EXHIBITOR_ARAB_HEALTH_ONLINE_PAGE: 1,
         F_FEATURED_EXHIBITOR: 2,
         F_COUNTRY: 3,
-        F_TEL_1: 4,
-        F_TEL_2: 5,
-        F_EMAIL: 6,
-        F_WEB_PAGE: 7,
-        F_ADDRESS: 8,
+        F_ADDRESS: 4,
+        F_TEL_1: 5,
+        F_TEL_2: 6,
+        F_EMAIL: 7,
+        F_WEB_PAGE: 8,
     }
 
     # Write headers into worksheet
@@ -74,7 +74,7 @@ def parse_exhibitor_detail_url():
                     # Save Exhibitor detail page url from Arab health online web.
                     worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_EXHIBITOR_ARAB_HEALTH_ONLINE_PAGE], url)
 
-                    # Save featured exhibitor.
+                    # Save featured exhibitor boolean.
                     div_label_featured_exhibitor = soup.find("div", text="Type")
                     if div_label_featured_exhibitor:
                         worksheet.write(row, WORKSHEET_FIELDS_COLUMNS[F_FEATURED_EXHIBITOR], "yes")
