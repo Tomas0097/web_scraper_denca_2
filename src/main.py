@@ -6,8 +6,7 @@ def run_parsing():
     # get_detail_urls_from_exhibitor_list(None)
     parse_exhibitor_detail_url()
 
-    while True:
-        pass
+    print("Completed")
 
 
 if __name__ == "__main__":
